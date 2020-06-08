@@ -302,6 +302,23 @@ loop:
 			}
 
 			thread.endProfSpan()
+
+			//// Starish extends
+			if function.String() == "<built-in function sh>" {
+				shEnv := NewDict(len(locals) + len(fn.Globals().Keys()))
+				for _, v := range fn.Globals().Keys() {
+					gv := fn.Globals()[v]
+					if gv.Type() != "function" {
+						shEnv.SetKey(String(v), gv)
+					}
+				}
+				for i := range f.Locals {
+					shEnv.SetKey(String(f.Locals[i].Name), locals[i])
+				}
+				kvpairs = append(kvpairs, Tuple{String(":env"), shEnv})
+			}
+			//// End of Starish extend
+
 			z, err2 := Call(thread, function, positional, kvpairs)
 			thread.beginProfSpan()
 			if err2 != nil {
