@@ -2,6 +2,7 @@ package starlark
 
 import (
 	"fmt"
+
 	"github.com/kassybas/shell-exec/exec"
 )
 
@@ -27,7 +28,7 @@ func sh(thread *Thread, b *Builtin, args Tuple, kwargs []Tuple) (Value, error) {
 		ShieldEnv: shieldEnv,
 		ShellPath: shellPath,
 	}
-	envVars, err := getEnvVars(env)
+	envVars, err := getEnvVars(env, sep)
 	if err != nil {
 		return nil, fmt.Errorf("sh: could not parse variables")
 	}
@@ -39,18 +40,47 @@ func sh(thread *Thread, b *Builtin, args Tuple, kwargs []Tuple) (Value, error) {
 	return NewList(result), nil
 }
 
-func getEnvVars(arg Value) ([]string, error) {
-	// TODO(kassybas): handle errors sanely
+func getEnvVars(arg Value, sep string) ([]string, error) {
 	if arg.Type() != "dict" {
-		return nil, fmt.Errorf("sh env vars: expected dict, got: %s", arg.Type())
+		return nil, fmt.Errorf("sh internal error: expected dict, got: %s", arg.Type())
 	}
 	d := arg.(*Dict)
-	res := make([]string, len(d.Keys()))
-	for i, k := range d.Keys() {
-		v, _, _ := d.Get(k)
+	res := []string{}
+	for _, k := range d.Keys() {
 		name, _ := AsString(k)
-		val, _ := AsString(v)
-		res[i] = fmt.Sprintf("%s=%s", name, val)
+		v, _, _ := d.Get(k)
+		vals := getDeepEnvVars(v, name, sep)
+		res = append(res, vals...)
 	}
 	return res, nil
+}
+
+func getDeepEnvVars(v Value, prefix, sep string) []string {
+	res := []string{}
+	switch v.Type() {
+	case "string":
+		val, _ := AsString(v)
+		res = []string{fmt.Sprintf("%s=%s", prefix, val)}
+	case "int", "float", "bool", "NoneType":
+		res = []string{fmt.Sprintf("%s=%s", prefix, v.String())}
+	case "dict":
+		d := v.(*Dict)
+		for _, k := range d.Keys() {
+			name, _ := AsString(k)
+			newPrefix := fmt.Sprintf("%s%s%s", prefix, sep, name)
+			v, _, _ := d.Get(k)
+			res = append(res, getDeepEnvVars(v, newPrefix, sep)...)
+		}
+	case "tuple", "list", "set":
+		iter := Iterate(v)
+		var z Value
+		i := 0
+		for iter.Next(&z) {
+			i++
+			newPrefix := fmt.Sprintf("%s%s%d", prefix, sep, i)
+			res = append(res, getDeepEnvVars(z, newPrefix, sep)...)
+		}
+		iter.Done()
+	}
+	return res
 }
