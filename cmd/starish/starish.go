@@ -18,6 +18,7 @@ import (
 	"go.starlark.net/internal/compile"
 	"go.starlark.net/repl"
 	"go.starlark.net/resolve"
+	"go.starlark.net/starish"
 	"go.starlark.net/starlark"
 )
 
@@ -103,7 +104,12 @@ func doMain() int {
 			filename = flag.Arg(0)
 		}
 		thread.Name = "exec " + filename
-		globals, err = starlark.ExecFile(thread, filename, src, nil)
+
+		predeclared := starlark.StringDict{
+			"sh": starlark.NewBuiltin("sh", starish.Sh), //TODO: move this from builtins
+		}
+		globals, err = starlark.ExecFile(thread, filename, src, predeclared)
+
 		if err != nil {
 			repl.PrintError(err)
 			return 1

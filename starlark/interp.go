@@ -303,7 +303,9 @@ loop:
 
 			thread.endProfSpan()
 
-			//// Starish extends
+			//// Starish piping
+			//    To behave as shell, the variables of the current scope should be exposed
+			//    to the sh() function, so they are injected as kv arguments during the call
 			if function.String() == "<built-in function sh>" {
 				shEnv := NewDict(len(locals) + len(fn.Globals().Keys()))
 				for _, v := range fn.Globals().Keys() {
@@ -313,11 +315,15 @@ loop:
 					}
 				}
 				for i := range f.Locals {
-					shEnv.SetKey(String(f.Locals[i].Name), locals[i])
+					if locals[i].Type() != "function" {
+						shEnv.SetKey(String(f.Locals[i].Name), locals[i])
+					}
 				}
+				// the kvpairs are extended as a single element with the ':env' key
+				// which is an illegal symbol thus avoiding collision
 				kvpairs = append(kvpairs, Tuple{String(":env"), shEnv})
 			}
-			//// End of Starish extend
+			//// End of Starish piping
 
 			z, err2 := Call(thread, function, positional, kvpairs)
 			thread.beginProfSpan()

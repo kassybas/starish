@@ -61,7 +61,6 @@ func init() {
 		"repr":      NewBuiltin("repr", repr),
 		"reversed":  NewBuiltin("reversed", reversed),
 		"set":       NewBuiltin("set", set), // requires resolve.AllowSet
-		"sh":        NewBuiltin("sh", sh),   //TODO: move this from builtins
 		"sorted":    NewBuiltin("sorted", sorted),
 		"str":       NewBuiltin("str", str),
 		"tuple":     NewBuiltin("tuple", tuple),
