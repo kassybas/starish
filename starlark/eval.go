@@ -491,6 +491,10 @@ func EvalExpr(thread *Thread, expr syntax.Expr, env StringDict) (Value, error) {
 	//-- Starish plumbing
 	shEnv := NewDict(len(env.Keys()))
 	for k, v := range env {
+		if strings.HasPrefix(v.String(), "<") {
+			// ignore functions for the starish env vars
+			continue
+		}
 		shEnv.SetKey(String(k), v)
 	}
 	thread.SetLocal("starishEnv", shEnv)
