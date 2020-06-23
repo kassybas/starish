@@ -87,6 +87,9 @@ func doMain() int {
 
 	thread := &starlark.Thread{Load: repl.MakeLoad()}
 	globals := make(starlark.StringDict)
+	predeclared := starlark.StringDict{
+		"sh": starlark.NewBuiltin("sh", starish.Sh),
+	}
 
 	switch {
 	case flag.NArg() == 1 || *execprog != "":
@@ -105,9 +108,6 @@ func doMain() int {
 		}
 		thread.Name = "exec " + filename
 
-		predeclared := starlark.StringDict{
-			"sh": starlark.NewBuiltin("sh", starish.Sh), //TODO: move this from builtins
-		}
 		globals, err = starlark.ExecFile(thread, filename, src, predeclared)
 
 		if err != nil {
@@ -117,6 +117,7 @@ func doMain() int {
 	case flag.NArg() == 0:
 		fmt.Println("Welcome to Starish (go.starlark.net)")
 		thread.Name = "REPL"
+		globals = predeclared
 		repl.REPL(thread, globals)
 		return 0
 	default:

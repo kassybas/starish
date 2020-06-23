@@ -12,8 +12,7 @@ func Sh(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple, kwarg
 	sep := "_"
 	silent := false
 	shieldEnv := false
-	var env *starlark.Dict
-	if err := starlark.UnpackArgs("sh", nil, kwargs, "shell?", &shellPath, "shield_env?", &shieldEnv, "silent?", &silent, "sep?", &sep, ":env?", &env); err != nil {
+	if err := starlark.UnpackArgs("sh", nil, kwargs, "shell?", &shellPath, "shield_env?", &shieldEnv, "silent?", &silent, "sep?", &sep); err != nil {
 		return nil, err
 	}
 	if len(args) != 1 {
@@ -29,7 +28,8 @@ func Sh(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple, kwarg
 		ShieldEnv: shieldEnv,
 		ShellPath: shellPath,
 	}
-	envVars, err := getEnvVars(env, sep)
+	starishEnv := thread.Local("starishEnv").(*starlark.Dict)
+	envVars, err := getEnvVars(starishEnv, sep)
 	if err != nil {
 		return nil, fmt.Errorf("sh: could not parse variables")
 	}

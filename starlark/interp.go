@@ -303,27 +303,33 @@ loop:
 
 			thread.endProfSpan()
 
-			//// Starish piping
-			//    To behave as shell, the variables of the current scope should be exposed
-			//    to the sh() function, so they are injected as kv arguments during the call
+			//-- Starish plumbing
+			//  To behave as shell, the variables of the current scope should be exposed
+			//  to the sh() function, so they are injected as kv arguments during the call
 			if function.String() == "<built-in function sh>" {
-				shEnv := NewDict(len(locals) + len(fn.Globals().Keys()))
-				for _, v := range fn.Globals().Keys() {
-					gv := fn.Globals()[v]
-					if gv.Type() != "function" {
-						shEnv.SetKey(String(v), gv)
+				// REPL handles toplevel and global binding differently
+				// so the globals already were set in the eval step
+				var shEnv *Dict
+				if thread.Local("starishEnvREPL") == nil {
+					shEnv := NewDict(len(locals) + len(fn.Globals().Keys()))
+					fmt.Println("it wasn't the REPL!!!!")
+					for _, v := range fn.Globals().Keys() {
+						gv := fn.Globals()[v]
+						if gv.Type() != "function" {
+							shEnv.SetKey(String(v), gv)
+						}
 					}
+				} else {
+					shEnv = thread.Local("starishEnv").(*Dict)
 				}
 				for i := range f.Locals {
 					if locals[i].Type() != "function" {
 						shEnv.SetKey(String(f.Locals[i].Name), locals[i])
 					}
 				}
-				// the kvpairs are extended as a single element with the ':env' key
-				// which is an illegal symbol thus avoiding collision
-				kvpairs = append(kvpairs, Tuple{String(":env"), shEnv})
+				thread.SetLocal("starishEnv", shEnv)
 			}
-			//// End of Starish piping
+			//-- End of starish plumbing
 
 			z, err2 := Call(thread, function, positional, kvpairs)
 			thread.beginProfSpan()

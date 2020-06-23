@@ -487,6 +487,16 @@ func EvalExpr(thread *Thread, expr syntax.Expr, env StringDict) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//-- Starish plumbing
+	shEnv := NewDict(len(env.Keys()))
+	for k, v := range env {
+		shEnv.SetKey(String(k), v)
+	}
+	thread.SetLocal("starishEnv", shEnv)
+	thread.SetLocal("starishEnvREPL", true)
+	//-- End of starish plumbing
+
 	return Call(thread, fn, nil, nil)
 }
 
