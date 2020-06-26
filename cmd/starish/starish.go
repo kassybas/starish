@@ -175,7 +175,6 @@ func doMain(args argConfig) int {
 			// There is a nicer solution to this during eval, but this keeps starlark
 			// pristine for uplift, decreases plumbing
 			funcCall, err := makeFuncCall(args.targetFunc, args.funcArgs)
-			fmt.Println("HEREHRERE", funcCall)
 			check(err)
 			src = fmt.Sprintf(`load("%s", "%s"); %s`, args.fileName, args.targetFunc, funcCall)
 		}

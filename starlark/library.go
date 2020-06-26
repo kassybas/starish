@@ -67,7 +67,8 @@ func init() {
 		"type":      NewBuiltin("type", type_),
 		"zip":       NewBuiltin("zip", zip),
 		// Starish
-		"sh": NewBuiltin("sh", sh),
+		"sh":     NewBuiltin("sh", sh),
+		"module": NewBuiltin("module", MakeModule),
 	}
 }
 
