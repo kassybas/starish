@@ -66,6 +66,8 @@ func init() {
 		"tuple":     NewBuiltin("tuple", tuple),
 		"type":      NewBuiltin("type", type_),
 		"zip":       NewBuiltin("zip", zip),
+		// Starish
+		"sh": NewBuiltin("sh", sh),
 	}
 }
 

@@ -307,12 +307,10 @@ loop:
 			//  To behave as shell, the variables of the current scope should be exposed
 			//  to the sh() function, so they are injected as kv arguments during the call
 			if function.String() == "<built-in function sh>" {
-				// REPL handles toplevel and global binding differently
-				// so the globals already were set in the eval step
-				var shEnv *Dict
+				shEnv := NewDict(len(locals))
 				if thread.Local("starishEnvREPL") == nil {
-					shEnv := NewDict(len(locals) + len(fn.Globals().Keys()))
-					fmt.Println("it wasn't the REPL!!!!")
+					// REPL handles toplevel and global binding differently
+					// so the globals already were set in the eval step
 					for _, v := range fn.Globals().Keys() {
 						gv := fn.Globals()[v]
 						if gv.Type() != "function" {
