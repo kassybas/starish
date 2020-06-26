@@ -163,6 +163,7 @@ func doMain(args argConfig) int {
 	starlark.Universe["sh"] = starlark.NewBuiltin("sh", starish.Sh)
 	starlark.Universe["module"] = starlark.NewBuiltin("module", starlarkstruct.MakeModule)
 	starlark.Universe["yaml"] = starlarkyaml.Module
+	starlark.Universe["file"] = starish.FileModule
 
 	switch {
 	case args.REPL:
