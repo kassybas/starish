@@ -20,6 +20,7 @@ import (
 	"go.starlark.net/repl"
 	"go.starlark.net/resolve"
 	"go.starlark.net/starlark"
+	"go.starlark.net/starlarkjson"
 )
 
 type argConfig struct {
@@ -151,10 +152,14 @@ func doMain(args argConfig) int {
 	thread := &starlark.Thread{Load: repl.MakeLoad()}
 	globals := make(starlark.StringDict)
 
+	// Ideally this statement would update the predeclared environment.
+	// TODO(adonovan): plumb predeclared env through to the REPL.
+	starlark.Universe["json"] = starlarkjson.Module
+
 	switch {
 	case args.REPL:
 		if args.fileName != "" && args.fileName != "Starfile" {
-			log.Print("Ambiguous command line arguments: interactive mode (-i) and file (-f)")
+			log.Print("ambiguous command line arguments: interactive mode (-i) and file (-f)")
 			return 1
 		}
 		fmt.Println("Welcome to Starish")

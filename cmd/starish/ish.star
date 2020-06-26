@@ -1,5 +1,5 @@
 
-load("loaded.star", "loaded")
+# load("loaded.star", "loaded")
 
 def welcome(msg="foo", prefix="PREPRE", shout=False):
     print(prefix, msg)
@@ -8,9 +8,14 @@ def welcome(msg="foo", prefix="PREPRE", shout=False):
     # THISS DOESNOT WORK
     sh("echo this is shell")
 
-loaded.trial("okay")
+# loaded.trial("okay")
 
 print("---init")
+
+hello = "okay"
+
+
+print("okay")
 
 
 #
