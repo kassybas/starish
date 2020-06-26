@@ -19,8 +19,10 @@ import (
 	"go.starlark.net/internal/compile"
 	"go.starlark.net/repl"
 	"go.starlark.net/resolve"
+	"go.starlark.net/starish"
 	"go.starlark.net/starlark"
 	"go.starlark.net/starlarkjson"
+	"go.starlark.net/starlarkstruct"
 )
 
 type argConfig struct {
@@ -155,6 +157,8 @@ func doMain(args argConfig) int {
 	// Ideally this statement would update the predeclared environment.
 	// TODO(adonovan): plumb predeclared env through to the REPL.
 	starlark.Universe["json"] = starlarkjson.Module
+	starlark.Universe["sh"] = starlark.NewBuiltin("sh", starish.Sh)
+	starlark.Universe["module"] = starlark.NewBuiltin("module", starlarkstruct.MakeModule)
 
 	switch {
 	case args.REPL:
