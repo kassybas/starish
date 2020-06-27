@@ -32,7 +32,7 @@ func readFile(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple,
 
 func writeFile(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	if args.Len() != 2 {
-		return nil, fmt.Errorf("write: want exactly 2 arguments: file name, source", args.Index(0))
+		return nil, fmt.Errorf("write: want exactly 2 arguments: file name, content")
 
 	}
 	path, ok := starlark.AsString(args.Index(0))
