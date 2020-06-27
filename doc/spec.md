@@ -345,6 +345,12 @@ using the other kind, as in these examples:
 'Yes, it\'s a classic.'
 ```
 
+Literal occurrences of the _opposite_ kind of quotation mark, such as
+an apostrophe within a double-quoted string literal, may be escaped
+by a backslash, but this is not necessary: `"it's"` and `"it\'s"` are
+equivalent.
+
+
 #### String escapes
 
 Within a string literal, the backslash character `\` indicates the
@@ -2945,7 +2951,7 @@ load("module.star", "x", "y", "z")       # assigns x, y, and z
 load("module.star", "x", y2="y", "z")    # assigns x, y2, and z
 ```
 
-A load statement within a function is a static error.
+A load statement may not be nested inside any other statement.
 
 
 ## Module execution

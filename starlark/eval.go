@@ -487,6 +487,20 @@ func EvalExpr(thread *Thread, expr syntax.Expr, env StringDict) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//-- Starish plumbing
+	shEnv := NewDict(len(env.Keys()))
+	for k, v := range env {
+		if strings.HasPrefix(v.String(), "<") {
+			// ignore functions for the starish env vars
+			continue
+		}
+		shEnv.SetKey(String(k), v)
+	}
+	thread.SetLocal("starishEnv", shEnv)
+	thread.SetLocal("starishEnvREPL", true)
+	//-- End of starish plumbing
+
 	return Call(thread, fn, nil, nil)
 }
 
@@ -1027,7 +1041,8 @@ func tupleRepeat(elems Tuple, n Int) (Tuple, error) {
 	// Inv: i > 0, len > 0
 	sz := len(elems) * i
 	if sz < 0 || sz >= maxAlloc { // sz < 0 => overflow
-		return nil, fmt.Errorf("excessive repeat (%d elements)", sz)
+		// Don't print sz.
+		return nil, fmt.Errorf("excessive repeat (%d * %d elements)", len(elems), i)
 	}
 	res := make([]Value, sz)
 	// copy elems into res, doubling each time
@@ -1053,7 +1068,8 @@ func stringRepeat(s String, n Int) (String, error) {
 	// Inv: i > 0, len > 0
 	sz := len(s) * i
 	if sz < 0 || sz >= maxAlloc { // sz < 0 => overflow
-		return "", fmt.Errorf("excessive repeat (%d elements)", sz)
+		// Don't print sz.
+		return "", fmt.Errorf("excessive repeat (%d * %d elements)", len(s), i)
 	}
 	return String(strings.Repeat(string(s), i)), nil
 }

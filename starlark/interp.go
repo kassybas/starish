@@ -19,6 +19,9 @@ const vmdebug = false // TODO(adonovan): use a bitfield of specific kinds of err
 // - opt: record MaxIterStack during compilation and preallocate the stack.
 
 func (fn *Function) CallInternal(thread *Thread, args Tuple, kwargs []Tuple) (Value, error) {
+	// Postcondition: args is not mutated. This is stricter than required by Callable,
+	// but allows CALL to avoid a copy.
+
 	if !resolve.AllowRecursion {
 		// detect recursion
 		for _, fr := range thread.stack[:len(thread.stack)-1] {
@@ -276,9 +279,15 @@ loop:
 			// positional args
 			var positional Tuple
 			if npos := int(arg >> 8); npos > 0 {
-				positional = make(Tuple, npos)
+				positional = stack[sp-npos : sp]
 				sp -= npos
-				copy(positional, stack[sp:])
+
+				// Copy positional arguments into a new array,
+				// unless the callee is another Starlark function,
+				// in which case it can be trusted not to mutate them.
+				if _, ok := stack[sp-1].(*Function); !ok || args != nil {
+					positional = append(Tuple(nil), positional...)
+				}
 			}
 			if args != nil {
 				// Add elements from *args sequence.
@@ -302,6 +311,33 @@ loop:
 			}
 
 			thread.endProfSpan()
+
+			//-- Starish plumbing
+			//  To behave as shell, the variables of the current scope should be exposed
+			//  to the sh() function, so they are injected as kv arguments during the call
+			if function.String() == "<built-in function sh>" {
+				shEnv := NewDict(len(locals))
+				if thread.Local("starishEnvREPL") == nil {
+					// REPL handles toplevel and global binding differently
+					// so the globals already were set in the eval step
+					for _, v := range fn.Globals().Keys() {
+						gv := fn.Globals()[v]
+						if gv.Type() != "function" {
+							shEnv.SetKey(String(v), gv)
+						}
+					}
+				} else {
+					shEnv = thread.Local("starishEnv").(*Dict)
+				}
+				for i := range f.Locals {
+					if locals[i].Type() != "function" {
+						shEnv.SetKey(String(f.Locals[i].Name), locals[i])
+					}
+				}
+				thread.SetLocal("starishEnv", shEnv)
+			}
+			//-- End of starish plumbing
+
 			z, err2 := Call(thread, function, positional, kvpairs)
 			thread.beginProfSpan()
 			if err2 != nil {

@@ -1,30 +1,37 @@
 
-# Starish
+<!-- This file is the project homepage for go.starlark.net -->
 
-Starlark integrated shell.
+# Starlark in Go
 
-<!-- [![Travis CI](https://travis-ci.org/google/starlark-go.svg)](https://travis-ci.org/google/starlark-go) -->
-<!-- [![GoDoc](https://godoc.org/go.starlark.net/starlark?status.svg)](https://godoc.org/go.starlark.net/starlark) -->
+[![Travis CI](https://travis-ci.org/google/starlark-go.svg)](https://travis-ci.org/google/starlark-go)
+[![GoDoc](https://godoc.org/go.starlark.net/starlark?status.svg)](https://godoc.org/go.starlark.net/starlark)
 
-Starish is a modified version of Starlark with focus on adding capabilities for shell scripting.
+This is the home of the _Starlark in Go_ project.
+Starlark in Go is an interpreter for Starlark, implemented in Go.
+Starlark was formerly known as Skylark.
+The new import path for Go packages is `"go.starlark.net/starlark"`.
 
-For more information on the Starlark see their [homepage](go.starlark.net/starlark)
+Starlark is a dialect of Python intended for use as a configuration language.
+Like Python, it is an untyped dynamic language with high-level data
+types, first-class functions with lexical scope, and garbage collection.
+Unlike CPython, independent Starlark threads execute in parallel, so
+Starlark workloads scale well on parallel machines.
+Starlark is a small and simple language with a familiar and highly
+readable syntax. You can use it as an expressive notation for
+structured data, defining functions to eliminate repetition, or you
+can use it to add scripting capabilities to an existing application.
 
-## Why?
-
-TODO
-
-## Starlark vs Starish
-
-TODO
-
-## Install
-
-TODO
-
-## Quickstart
-
-TODO
+A Starlark interpreter is typically embedded within a larger
+application, and the application may define additional domain-specific
+functions and data types beyond those provided by the core language.
+For example, Starlark was originally developed for the
+[Bazel build tool](https://bazel.build).
+Bazel uses Starlark as the notation both for its BUILD files (like
+Makefiles, these declare the executables, libraries, and tests in a
+directory) and for [its macro
+language](https://docs.bazel.build/versions/master/skylark/language.html),
+through which Bazel is extended with custom logic to support new
+languages and compilers.
 
 
 ## Documentation
