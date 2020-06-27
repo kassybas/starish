@@ -14,18 +14,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package starlarkyaml
+package skycfg
 
 import (
 	"fmt"
 	"testing"
 
+	"go.starlark.net/resolve"
 	"go.starlark.net/starlark"
 )
 
 type YamlTestCase struct {
 	skyExpr   string
 	expOutput string
+}
+
+func init() {
+	resolve.AllowFloat = true
 }
 
 func TestSkyToYaml(t *testing.T) {

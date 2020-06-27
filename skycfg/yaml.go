@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package starlarkyaml
+package skycfg
 
 import (
 	"bytes"
@@ -22,33 +22,28 @@ import (
 	"reflect"
 
 	"go.starlark.net/starlark"
-	"go.starlark.net/starlarkstruct"
 	yaml "gopkg.in/yaml.v2"
 )
 
-var Module = &starlarkstruct.Module{
-	Name: "yaml",
-	Members: starlark.StringDict{
-		"encode": starlark.NewBuiltin("yaml.encode", fnYamlMarshal),
-		"decode": starlark.NewBuiltin("yaml.decode", fnYamlUnmarshal),
-	},
+// YamlModule returns a Starlark module for YAML helpers.
+func YamlModule() starlark.Value {
+	return &Module{
+		Name: "yaml",
+		Attrs: starlark.StringDict{
+			"marshal":   yamlMarshal(),
+			"unmarshal": yamlUnmarshal(),
+		},
+	}
 }
 
-// // YamlModule returns a Starlark module for YAML helpers.
-// func YamlModule() starlark.Value {
-// 	return &Module{
-// 		Name: "yaml",
-// 		Attrs: starlark.StringDict{
-// 			"marshal":   yamlMarshal(),
-// 			"unmarshal": yamlUnmarshal(),
-// 		},
-// 	}
-// }
-
-// YamlMarshal returns a Starlark function for marshaling plain values
+// yamlMarshal returns a Starlark function for marshaling plain values
 // (dicts, lists, etc) to YAML.
 //
 //  def yaml.marshal(value) -> str
+func yamlMarshal() starlark.Callable {
+	return starlark.NewBuiltin("yaml.marshal", fnYamlMarshal)
+}
+
 func fnYamlMarshal(t *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var v starlark.Value
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs, "value", &v); err != nil {
@@ -69,10 +64,14 @@ func fnYamlMarshal(t *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple
 	return starlark.String(yamlBytes), nil
 }
 
-// YamlUnmarshal returns a Starlark function for unmarshaling yaml content to
+// yamlUnmarshal returns a Starlark function for unmarshaling yaml content to
 // to starlark values.
 //
 // def yaml.unmarshal(yaml_content) -> (dicts, lists, etc)
+func yamlUnmarshal() starlark.Callable {
+	return starlark.NewBuiltin("yaml.unmarshal", fnYamlUnmarshal)
+}
+
 func fnYamlUnmarshal(t *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var blob string
 	if err := starlark.UnpackPositionalArgs(fn.Name(), args, nil, 1, &blob); err != nil {

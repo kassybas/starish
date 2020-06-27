@@ -19,11 +19,11 @@ import (
 	"go.starlark.net/internal/compile"
 	"go.starlark.net/repl"
 	"go.starlark.net/resolve"
+	"go.starlark.net/skycfg"
 	"go.starlark.net/starish"
 	"go.starlark.net/starlark"
 	"go.starlark.net/starlarkjson"
 	"go.starlark.net/starlarkstruct"
-	"go.starlark.net/starlarkyaml"
 )
 
 type argConfig struct {
@@ -162,7 +162,7 @@ func doMain(args argConfig) int {
 	// Starish extensions
 	starlark.Universe["sh"] = starlark.NewBuiltin("sh", starish.Sh)
 	starlark.Universe["module"] = starlark.NewBuiltin("module", starlarkstruct.MakeModule)
-	starlark.Universe["yaml"] = starlarkyaml.Module
+	starlark.Universe["yaml"] = skycfg.YamlModule()
 	starlark.Universe["file"] = starish.FileModule
 
 	switch {
