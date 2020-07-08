@@ -175,7 +175,8 @@ func doMain(args argConfig) int {
 		thread.Name = "REPL"
 		repl.REPL(thread, globals)
 		return 0
-	case args.fileName != "Starfile" || args.targetFunc != "" || args.execProg != "":
+		// case args.targetFunc != "" || args.execProg != "":
+	default:
 		var (
 			src interface{}
 			err error
@@ -204,9 +205,6 @@ func doMain(args argConfig) int {
 			repl.PrintError(err)
 			return 1
 		}
-	default:
-		log.Print("want at most one Starish file name")
-		return 1
 	}
 
 	// Print the global environment.
