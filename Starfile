@@ -7,12 +7,15 @@ build_platforms = [
 
 revision, _, _ = sh("git describe --tags HEAD", silent=True)
 
+docker_img = "kassybas/starish"
+docker_tag = "{}:{}".format(docker_img, revision)
+
 def build_all():
     for plat in build_platforms:
         build(plat)
 
 def build(plat):
-    print("Building:", plat)
+    print("Building:", plat, "...")
     sh('''
         GOOS=${plat_os} GOARCH=${plat_arch} \
         go build  \
@@ -25,10 +28,32 @@ def build(plat):
 def install_darwin():
     sh('cp bin/starish_amd64_darwin_${revision} /usr/local/bin/starish')
 
-def release(version):
+def tag_release(version):
     status, _, _ = sh('git status --porcelain', silent=True)
     if status != "":
        fail("git working directory not clean")
     sh("git tag ${version} HEAD")
+
+def docker_build():
+    sh('docker build -t ${docker_tag} .')
+
+def docker_release():
+    docker_build()
+    latest_docker_tag = "{}:{}".format(docker_img, "latest")
+    sh('''
+        docker tag ${docker_tag} ${latest_docker_tag}
+        docker push ${docker_tag} 
+        docker push ${latest_docker_tag}
+    ''')
+
+
+def release(version):
+    tag_release(version)
+    revision = version
+    build_all()
+    #bin_release_github()
+    docker_release()
+
+
     
 
