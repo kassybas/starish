@@ -330,7 +330,7 @@ loop:
 					shEnv = thread.Local("starishEnv").(*Dict)
 				}
 				for i := range f.Locals {
-					if locals[i].Type() != "function" {
+					if locals[i] != nil && locals[i].Type() != "function" {
 						shEnv.SetKey(String(f.Locals[i].Name), locals[i])
 					}
 				}
