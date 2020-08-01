@@ -1,8 +1,0 @@
-
-load("vendor/ish.star", "foo")
-
-name = "World"
-
-def welcome():
-    print("welcome")
-

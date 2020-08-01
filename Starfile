@@ -1,0 +1,34 @@
+
+build_platforms = [
+    {"os": "darwin", "arch":"amd64"},
+    {"os": "linux", "arch":"amd64"},
+    {"os": "linux", "arch":"arm64"},
+]
+
+revision, _, _ = sh("git describe --tags HEAD", silent=True)
+
+def build_all():
+    for plat in build_platforms:
+        build(plat)
+
+def build(plat):
+    print("Building:", plat)
+    sh('''
+        GOOS=${plat_os} GOARCH=${plat_arch} \
+        go build  \
+            -ldflags "-s -w -X 'main.version=${revision}'" \
+            -o bin/starish_${plat_arch}_${plat_os}_${revision} \
+            cmd/starish/starish.go 
+    ''')
+    print("Done")
+
+def install_darwin():
+    sh('cp bin/starish_amd64_darwin_${revision} /usr/local/bin/starish')
+
+def release(version):
+    status, _, _ = sh('git status --porcelain', silent=True)
+    if status != "":
+       fail("git working directory not clean")
+    sh("git tag ${version} HEAD")
+    
+

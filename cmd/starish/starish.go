@@ -38,6 +38,10 @@ type argConfig struct {
 	REPL       bool
 }
 
+var (
+	version string
+)
+
 func init() {
 	// starish defaults
 	resolve.AllowFloat = true
@@ -45,13 +49,14 @@ func init() {
 	resolve.AllowLambda = true
 	resolve.AllowNestedDef = true
 	resolve.AllowRecursion = true
+	resolve.AllowGlobalReassign = true
 }
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "starish"
 	app.Usage = "Starish: starlark integrated shell"
-	app.Version = "0.1.0"
+	app.Version = version
 
 	var args argConfig
 
@@ -97,11 +102,6 @@ func main() {
 			Usage:       "show disassembly during compilation of each function",
 			Destination: &compile.Disassemble,
 		},
-		cli.BoolFlag{
-			Name:        "globalreassign",
-			Usage:       "allow reassignment of globals, and if/for/while statements at top level",
-			Destination: &resolve.AllowGlobalReassign,
-		},
 	}
 	app.Action = func(c *cli.Context) {
 		if c.NArg() > 0 {
@@ -116,7 +116,6 @@ func main() {
 func doMain(args argConfig) int {
 	log.SetPrefix("starish: ")
 	log.SetFlags(0)
-	// flag.Parse()
 
 	if args.cpuProfile != "" {
 		f, err := os.Create(args.cpuProfile)
