@@ -46,6 +46,8 @@ def docker_release():
         docker push ${latest_docker_tag}
     ''')
 
+def clean():
+    sh("rm bin/*")
 
 def release(version):
     tag_release(version)
