@@ -47,7 +47,23 @@ starish -i
 
 ## Install
 
-TODO
+### Locally
+
+Download the latest release from GitHub releases.
+
+### Docker
+
+Pull the latest release:
+
+``` shell
+docker pull kassybas/starish
+```
+
+Or copy starish to your Docker image:
+
+``` Dockerfile
+COPY --from=kassybas/starish /starish /usr/local/bin/starish
+```
 
 ## Why
 
@@ -84,10 +100,9 @@ The main extension of starish is the special `sh()` function, which makes it pos
 
 The captured the stdout, stderr and status code is returned.
 
-```
+``` python
 foo = "bar"
-out, err, rc = sh(
-"""
+out, err, rc = sh("""
   echo "hello world" >&2
   echo "${foo}"
   exit 42
@@ -95,10 +110,11 @@ out, err, rc = sh(
 ```
 
 ### Command line integration
+TODO
+
+### Complex variables
 
 ## Starlark vs Starish
-
-TODO
 
 
 

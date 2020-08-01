@@ -55,7 +55,3 @@ def release(version):
     build_all()
     #bin_release_github()
     docker_release()
-
-
-    
-

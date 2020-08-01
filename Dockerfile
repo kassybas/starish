@@ -18,4 +18,4 @@ RUN CGO_ENABLED=0 \
 
 FROM scratch
 COPY --from=build-env /starish /starish
-CMD ["/starish"]
+ENTRYPOINT ["/starish"]
