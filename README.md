@@ -1,11 +1,10 @@
 
 # Starish
 
-Starish: starlark integrated shell.
+Starish: python-like shell scripting, based on the Starlark langugage.
 
 [![Travis CI](https://travis-ci.org/kassybas/starish.svg?branch=master)](https://travis-ci.org/kassybas/starish)
 
-Starish is a a scripting language based on the python-like starlark, extending it with features to enable shell scripting.
 
 ## Quickstart
 
@@ -34,22 +33,32 @@ def foo():
   print("Hello foo")
 ```
 
-``` shell
-starish foo
+``` sh
+$ starish foo
 # output: "Hello foo"
 ```
 
 **Start** in interactive mode with flag `-i`
 
 ``` shell
-starish -i
+$ starish -i
 ```
 
 ## Install
 
-### Locally
+### MacOS
 
-Download the latest release from GitHub releases.
+```
+curl -Lo /usr/local/bin/starish https://github.com/kassybas/starish/releases/download/0.2.2/starish_amd64_darwin_0.2.2
+chmod +x /usr/local/bin/starish
+```
+
+### Linux
+
+```
+curl -Lo /usr/local/bin/starish https://github.com/kassybas/starish/releases/download/0.2.2/starish_amd64_linux_0.2.2
+chmod +x /usr/local/bin/starish
+```
 
 ### Docker
 
